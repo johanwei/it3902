@@ -5,7 +5,6 @@ export function tileGridForRegion(region, minZoom, maxZoom) {
       const subTiles = tilesForZoom(region, zoom)
       tiles = [...tiles, ...subTiles]
     }
-  
     return tiles
   }
   
@@ -19,7 +18,7 @@ export function tileGridForRegion(region, minZoom, maxZoom) {
     let maxTileX = lonToTileX(maxLon, zoom)
     let minTileY = latToTileY(maxLat, zoom)
     let maxTileY = latToTileY(minLat, zoom)
-  
+
     let tiles = []
   
     for (let x = minTileX; x <= maxTileX; x++) {
