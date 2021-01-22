@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from 'react'
 import { StyleSheet, Text, ActivityIndicator } from 'react-native'
+import { Card } from 'react-native-elements'
 import Slider from '@react-native-community/slider';
 import * as FileSystem from 'expo-file-system'
-import { Card, Button } from 'react-native-elements'
 import { tileGridForRegion } from './TileGrid'
-
 
 export default function downloadTiles(props) {
   const [maxZoom, setMaxZoom] = useState(0)
@@ -48,16 +47,13 @@ export default function downloadTiles(props) {
       await Promise.all(batch)
 
       alert('Finished downloading tiles, you are now viewing the offline map.')
-      /*
-      // Debug downloaded files
-      fileStatuses.forEach(file => {
-        console.log('Downloaded', file.uri)
-      })*/
-      
     }
 
     return (
-      <Card
+      <Text style={styles.warningMessage}>
+        Warning! Selecting a high detail level will take up more space.
+      </Text>
+      /*<Card
       title={'Select number of zoom levels to download'}
       containerStyle={styles.container}>
       <Text style={styles.warningMessage}>
@@ -78,7 +74,7 @@ export default function downloadTiles(props) {
       />
 
       <Button raised title="Last ned kart" onPress={fetchTiles} />
-      </Card>
+      </Card>*/
     )
 }
 
