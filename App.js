@@ -9,7 +9,7 @@ const MAP_TYPE = Platform.OS == 'android' ? 'none' : 'standard'
 
 export default function App() {
   const MAP_URL =  'https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}'
-  const TILES_FOLDER = `${FileSystem.documentDirectory}tiles/{z}/{x}/{y}.png`
+  const TILES_FOLDER = `${FileSystem.documentDirectory}tiles/{z}-{x}-{y}.png`
   const INITIAL_REGION = {
         latitude: 64.1608,
         longitude: 17.7808,
@@ -18,6 +18,7 @@ export default function App() {
       }
 
   const [isOffline, setIsOffline] = useState(false)
+  const [visisbleSettings, setVisisbleSettings] = useState(false)
   const [mapRegion, setMapRegion] = useState(INITIAL_REGION)
     
   const urlTemplate = useMemo(
@@ -27,6 +28,28 @@ export default function App() {
         : `${MAP_URL}`,
     [isOffline]
   )
+
+  async function deleteTiles() {
+    try {
+      await FileSystem.deleteAsync(`${FileSystem.documentDirectory}tiles`)
+      alert('Slettet nedlastet kart')
+    } catch (error) {
+      console.warn(error)
+    }
+  }
+
+  function toggleOffline() {
+    setIsOffline(!isOffline)
+  }
+
+  function toggeleDownloadSettings() {
+    setVisisbleSettings(!visisbleSettings)
+  }
+
+  function onDownloadComplete() {
+    setIsOffline(true)
+    setVisisbleSettings(false)
+  }
     
   return (
       <View style={styles.container}>
@@ -43,17 +66,13 @@ export default function App() {
         />
       </MapView>
       <View style={styles.actionContainer}>
+        <Button raised title={'Last ned kart'} onPress={toggeleDownloadSettings} />
+        <Button raised title={'Slett kart'} onPress={deleteTiles} />
         <Button
-          raised
-          borderRadius={5}
-          title={isOffline ? 'Go online' : 'Go offline'}
-          onPress={() => { 
-            setIsOffline(!isOffline)
-          }}
-        />
+          raised title={isOffline ? 'Bruk online' : 'Bruk offline'} onPress={toggleOffline}/>
       </View>      
-      
-      <DownloadTiles mapRegion={mapRegion}/>
+      {visisbleSettings && (
+      <DownloadTiles mapRegion={mapRegion} onFinish={onDownloadComplete} />)}
     </View>
   )   
 }
