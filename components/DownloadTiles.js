@@ -9,9 +9,11 @@ export default function downloadTiles(props) {
   const [maxZoom, setMaxZoom] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
 
+  const [ totalTiles, setTotalTiles ] = useState(0) 
+  const [ tilesDownloaded, setTilesDownloaded ] = useState(0) 
+
   const currentZoom = useMemo(() => {
     const zoom = calcZoom(props.mapRegion.longitudeDelta)
-    console.log(zoom)
     return zoom 
   }, [props.mapRegion])
 
@@ -20,6 +22,7 @@ export default function downloadTiles(props) {
 
     const tiles = tileGridForRegion(props.mapRegion, currentZoom, maxZoom)
  
+    setTotalTiles(tiles.length)
     /*
        * For Expo to be able to download the tiles,
        * the directories have to be created first.
@@ -30,24 +33,26 @@ export default function downloadTiles(props) {
       }*/
       await FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}tiles`, { intermediates: true })
 
-      const BATCH_SIZE = 100
+      const BATCH_SIZE = 10
 
       let batch = []
+      let tilesCounter = 0
   
       for (const tile of tiles){
         const fetchUrl = `https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom=${tile.z}&x=${tile.x}&y=${tile.y}`
         const localLocation = `${FileSystem.documentDirectory}tiles/${tile.z}-${tile.x}-${tile.y}.png`
         const tilePromise = FileSystem.downloadAsync(fetchUrl, localLocation)
-        
         batch.push(tilePromise)
-
+        
         if (batch.length >= BATCH_SIZE) {
-          await Promise.all(batch)
+          tilesCounter += (await Promise.all(batch)).length
+          setTilesDownloaded(tilesCounter)
           batch = []
         }
       }
-    
-      await Promise.all(batch)
+      
+      tilesCounter += (await Promise.all(batch)).length
+      setTilesDownloaded(tilesCounter)
 
       alert('Kartet er lastet ned. Du kan nå vise det i offline-modus.')
       setIsLoading(false)
@@ -74,7 +79,7 @@ export default function downloadTiles(props) {
         maximumValue={18}
         onValueChange={setMaxZoom}
       />
-      {isLoading && <ActivityIndicator />}
+      {isLoading && <Progress.Bar style={styles.bar} progress={tilesDownloaded/totalTiles} width={400} />}
       {!isLoading && <Button raised title="Last ned kart" onPress={fetchTiles} />}
       </View>
     )
@@ -104,6 +109,10 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 16,
     textAlign: 'center',
+  },
+  bar: {
+    bottom: 25,
+    left: 10,
   },
   estimate: {
     marginVertical: 15,
