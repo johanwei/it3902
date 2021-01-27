@@ -20,6 +20,8 @@ export default function App() {
   const [isOffline, setIsOffline] = useState(false)
   const [visisbleSettings, setVisisbleSettings] = useState(false)
   const [mapRegion, setMapRegion] = useState(INITIAL_REGION)
+
+  const [markers, setMarkers] = useState([])
     
   const urlTemplate = useMemo(
     () =>
@@ -59,11 +61,26 @@ export default function App() {
         maxZoomLevel={20}
         showsUserLocation={false}
         onRegionChangeComplete={setMapRegion}
+        onLongPress={(e) => setMarkers([...markers, {
+          id: markers.length,
+          value: e.nativeEvent.coordinate
+        }])}
       >
         <UrlTile 
           urlTemplate={urlTemplate}
-          shouldReplaceMapContent={true}
+          shouldReplaceMapContent={false}
         />
+        {markers.map((marker) => {
+          return (
+        <MapView.Marker key={marker.id} coordinate={marker.value}>
+          <MapView.Callout>
+            <Text>ID: {marker.id}</Text>
+            <Text>Latitude: {marker.value.latitude}</Text>
+            <Text>Longitude: {marker.value.longitude}</Text>
+          </MapView.Callout>        
+        </MapView.Marker>)})}
+        
+
       </MapView>
       <View style={styles.actionContainer}>
         <Button raised title={'Last ned kart'} onPress={toggeleDownloadSettings} />

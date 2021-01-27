@@ -79,7 +79,7 @@ export default function downloadTiles(props) {
         maximumValue={18}
         onValueChange={setMaxZoom}
       />
-      {isLoading && <Progress.Bar style={styles.bar} progress={tilesDownloaded/totalTiles} width={400} />}
+      {isLoading && <Progress.Bar style={styles.bar} progress={tilesDownloaded/totalTiles} width={350} />}
       {!isLoading && <Button raised title="Last ned kart" onPress={fetchTiles} />}
       </View>
     )
