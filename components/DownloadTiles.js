@@ -3,7 +3,7 @@ import { View, Button, StyleSheet, Text, ActivityIndicator } from 'react-native'
 import Slider from '@react-native-community/slider';
 import * as Progress from 'react-native-progress';
 import * as FileSystem from 'expo-file-system'
-import { tileGridForRegion } from './TileGrid'
+import { tileGridForRegion } from '../data/TileGrid'
 
 export default function downloadTiles(props) {
   const [maxZoom, setMaxZoom] = useState(0)

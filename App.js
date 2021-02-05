@@ -1,9 +1,9 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState, useMemo } from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
-import MapView, {MapTypes, UrlTile} from 'react-native-maps';
+import MapView, { UrlTile} from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import DownloadTiles from './components/DownloadTiles';
+import TrackLocation from './components/TrackLocation';
 
 const MAP_TYPE = Platform.OS == 'android' ? 'none' : 'standard'
 
@@ -20,8 +20,8 @@ export default function App() {
   const [isOffline, setIsOffline] = useState(false)
   const [visisbleSettings, setVisisbleSettings] = useState(false)
   const [mapRegion, setMapRegion] = useState(INITIAL_REGION)
-
   const [markers, setMarkers] = useState([])
+  const [trackLocation, setTrackLocation] = useState(false)
     
   const urlTemplate = useMemo(
     () =>
@@ -52,14 +52,25 @@ export default function App() {
     setIsOffline(true)
     setVisisbleSettings(false)
   }
+
+  function currentLocations(locations){
+    locations.forEach(element => {
+      console.log("latitude: " + element.latitude);
+      console.log("");
+    });
+  }
+
+  function toggleTrackLocation() {
+    setTrackLocation(!trackLocation)
+  }
     
   return (
       <View style={styles.container}>
         <MapView 
         style={{ flex: 1}} 
-        mapType={MAP_TYPE}
-        maxZoomLevel={20}
-        showsUserLocation={false}
+        mapType={'standard'}
+        maxZoomLevel={18}
+        //showsUserLocation={true}
         onRegionChangeComplete={setMapRegion}
         onLongPress={(e) => setMarkers([...markers, {
           id: markers.length,
@@ -68,7 +79,7 @@ export default function App() {
       >
         <UrlTile 
           urlTemplate={urlTemplate}
-          shouldReplaceMapContent={false}
+          shouldReplaceMapContent={true}
         />
         {markers.map((marker) => {
           return (
@@ -79,17 +90,17 @@ export default function App() {
             <Text>Longitude: {marker.value.longitude}</Text>
           </MapView.Callout>        
         </MapView.Marker>)})}
-        
 
       </MapView>
       <View style={styles.actionContainer}>
         <Button raised title={'Last ned kart'} onPress={toggeleDownloadSettings} />
         <Button raised title={'Slett kart'} onPress={deleteTiles} />
-        <Button
-          raised title={isOffline ? 'Bruk online' : 'Bruk offline'} onPress={toggleOffline}/>
+        <Button raised title={isOffline ? 'Bruk online' : 'Bruk offline'} onPress={toggleOffline}/>
       </View>      
+      <Button raised title='Track location' onPress={toggleTrackLocation}/>
       {visisbleSettings && (
       <DownloadTiles mapRegion={mapRegion} onFinish={onDownloadComplete} />)}
+      {trackLocation && <TrackLocation getLocations={currentLocations} />}
     </View>
   )   
 }
