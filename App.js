@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
-import MapView, { UrlTile} from 'react-native-maps';
+import MapView, { UrlTile, Polyline } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import DownloadTiles from './components/DownloadTiles';
 import TrackLocation from './components/TrackLocation';
+import MarkLocations from './components/MarkLocations';
 
 const MAP_TYPE = Platform.OS == 'android' ? 'none' : 'standard'
 
@@ -20,8 +21,9 @@ export default function App() {
   const [isOffline, setIsOffline] = useState(false)
   const [visisbleSettings, setVisisbleSettings] = useState(false)
   const [mapRegion, setMapRegion] = useState(INITIAL_REGION)
-  const [markers, setMarkers] = useState([])
+  const [markers, setMarkers] = useState([{latitude: 64, longitude: 17}])
   const [trackLocation, setTrackLocation] = useState(false)
+  const [currentLocations, setCurrentLocations] = useState([])
     
   const urlTemplate = useMemo(
     () =>
@@ -53,11 +55,9 @@ export default function App() {
     setVisisbleSettings(false)
   }
 
-  function currentLocations(locations){
-    locations.forEach(element => {
-      console.log("latitude: " + element.latitude);
-      console.log("");
-    });
+  function getCurrentLocations(locations){
+    setCurrentLocations(locations);
+    console.log("getcurrentlocations: " + locations.length);
   }
 
   function toggleTrackLocation() {
@@ -72,14 +72,31 @@ export default function App() {
         maxZoomLevel={18}
         //showsUserLocation={true}
         onRegionChangeComplete={setMapRegion}
-        onLongPress={(e) => setMarkers([...markers, {
-          id: markers.length,
-          value: e.nativeEvent.coordinate
+        onLongPress={(e) => setCurrentLocations([...currentLocations, {
+          latitude: e.nativeEvent.coordinate.latitude,
+          longitude: e.nativeEvent.coordinate.longitude,
+          //setMarkers([...markers, {
+          //latitude: e.nativeEvent.coordinate.latitude,
+          //longitude: e.nativeEvent.coordinate.longitude,
+          //id: markers.length,
+          //value: e.nativeEvent.coordinate
         }])}
-      >
+        >
         <UrlTile 
           urlTemplate={urlTemplate}
-          shouldReplaceMapContent={true}
+          shouldReplaceMapContent={false}
+        />
+
+        {console.log("running " + markers.length)}
+        <MarkLocations locations = {currentLocations} />
+           
+  
+        {/*
+        <MarkLocations />        
+        <Polyline
+            coordinates={currentLocations}
+        strokeWidth={6}
+
         />
         {markers.map((marker) => {
           return (
@@ -89,7 +106,7 @@ export default function App() {
             <Text>Latitude: {marker.value.latitude}</Text>
             <Text>Longitude: {marker.value.longitude}</Text>
           </MapView.Callout>        
-        </MapView.Marker>)})}
+          </MapView.Marker>)})}*/}
 
       </MapView>
       <View style={styles.actionContainer}>
@@ -100,7 +117,7 @@ export default function App() {
       <Button raised title='Track location' onPress={toggleTrackLocation}/>
       {visisbleSettings && (
       <DownloadTiles mapRegion={mapRegion} onFinish={onDownloadComplete} />)}
-      {trackLocation && <TrackLocation getLocations={currentLocations} />}
+      {trackLocation && <TrackLocation listOfLocations={getCurrentLocations} />}
     </View>
   )   
 }

@@ -8,6 +8,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/slider": "^3.0.3",
     "@react-native-community/toolbar-android": "0.1.0-rc.2",
     "expo": "~39.0.2",

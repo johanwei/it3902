@@ -1,43 +1,46 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 
-let locationsList = []
+const LOCATION_UPDATES_TASK = 'location-updates';
+
+let locationsList = [];
+let locationsListLength = 0;
+let locationsString = "";
 
 export default function trackLocation(props) {
-  //const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-
-  useMemo(() =>
-    console.log("hei"),
-    props.getLocations(locationsList),
-    [locationsList]
-  )
 
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestPermissionsAsync();
       if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
         console.log("error");
         alert("error")
         return;
       }
 
-      await Location.startLocationUpdatesAsync('firstTask', {
+      await Location.startLocationUpdatesAsync(LOCATION_UPDATES_TASK, {
         accuracy: Location.Accuracy.Balanced,
         distanceInterval: 1,
       })
     })();
   }, []);
 
+  setInterval(() => {
+    if (locationsList.length > locationsListLength)
+    {
+      props.listOfLocations(locationsList);
+      locationsListLength = locationsList.length;
+    }
+  }, 10000)
+
   return (
-      <Text>Current location</Text>
+      <Text>Current location {locationsList.length}</Text>
   )   
 }
 
-TaskManager.defineTask('firstTask', ({ data, error }) => {
+TaskManager.defineTask(LOCATION_UPDATES_TASK, ({ data, error }) => {
   if (error) {
     // Error occurred - check `error.message` for more details.
     console.log("error2");
@@ -45,14 +48,13 @@ TaskManager.defineTask('firstTask', ({ data, error }) => {
     return;
   }
   if (data) {
-    //console.log("success2");
     const { locations } = data;
-    locationsList.push({
-      "latitude" : locations[0].coords.latitude, 
-      "longitude": locations[0].coords.longitude
-    });
-    alert("latitude: " + locations[0].coords.latitude, 
-    "longitude: " + locations[0].coords.longitude);
+
+    locationsString += `${locations[0].coords.latitude},${locations[0].coords.longitude} `
+
+    locationsList = locationsString.trim().split(" ").map(a => a.split(",")).map(a => ({latitude: parseFloat(a[0]), longitude: parseFloat(a[1])}));
+
+    console.log("taskmanager: " + locationsList.length);
   }
 });
 
