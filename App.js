@@ -57,7 +57,10 @@ export default function App() {
 
   function getCurrentLocations(locations){
     setCurrentLocations(locations);
-    console.log("getcurrentlocations: " + locations.length);
+    locations.forEach(element => {
+      console.log(element);
+    });
+    //console.log("getcurrentlocations: " + locations.length);
   }
 
   function toggleTrackLocation() {
