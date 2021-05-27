@@ -8,8 +8,7 @@ export default function MarkLocations(props) {
 
     return (
 		<View>
-			<Text style={styles.actionContainer}>{props.locations.length}</Text>
-			{/*<Text style={styles.actionContainer}>{props.locations[3].latitude}</Text>*/}
+			{/*<Text style={styles.actionContainer}>{props.locations.length}</Text>*/}
 			<Polyline
 				coordinates={props.locations}
 				strokeWidth={6}

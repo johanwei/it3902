@@ -5,10 +5,12 @@ import * as FileSystem from 'expo-file-system';
 import DownloadTiles from './components/DownloadTiles';
 import TrackLocation from './components/TrackLocation';
 import MarkLocations from './components/MarkLocations';
+import RegisterSheep from './components/RegisterSheep';
 
 const MAP_TYPE = Platform.OS == 'android' ? 'none' : 'standard'
 
 export default function App() {
+
   const MAP_URL =  'https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}'
   const TILES_FOLDER = `${FileSystem.documentDirectory}tiles/{z}-{x}-{y}.png`
   const INITIAL_REGION = {
@@ -19,11 +21,15 @@ export default function App() {
       }
 
   const [isOffline, setIsOffline] = useState(false)
-  const [visisbleSettings, setVisisbleSettings] = useState(false)
+  const [visibleSettings, setVisibleSettings] = useState(false)
   const [mapRegion, setMapRegion] = useState(INITIAL_REGION)
-  const [markers, setMarkers] = useState([{latitude: 64, longitude: 17}])
   const [trackLocation, setTrackLocation] = useState(false)
   const [currentLocations, setCurrentLocations] = useState([])
+  const [currentLocation, setCurrentLocation] = useState()
+  const [stopTracking, setStopTracking] = useState(true)
+  const [sheepLocation, setSheepLocation] = useState([{latitude: 69, longitude: 16}])
+
+
     
   const urlTemplate = useMemo(
     () =>
@@ -46,36 +52,40 @@ export default function App() {
     setIsOffline(!isOffline)
   }
 
-  function toggeleDownloadSettings() {
-    setVisisbleSettings(!visisbleSettings)
+  function toggleDownloadSettings() {
+    setVisibleSettings(!visisbleSettings)
   }
 
   function onDownloadComplete() {
     setIsOffline(true)
-    setVisisbleSettings(false)
+    setVisibleSettings(false)
   }
 
   function getCurrentLocations(locations){
     setCurrentLocations(locations);
-    locations.forEach(element => {
-      console.log(element);
-    });
-    //console.log("getcurrentlocations: " + locations.length);
+  }
+
+  function getCurrentLocation(loc){
+    setCurrentLocation(loc);
   }
 
   function toggleTrackLocation() {
-    setTrackLocation(!trackLocation)
+    setStopTracking(!stopTracking)
+    setTrackLocation(!trackLocation);
   }
     
   return (
+    
       <View style={styles.container}>
         <MapView 
         style={{ flex: 1}} 
         mapType={'standard'}
         maxZoomLevel={18}
-        //showsUserLocation={true}
+        showsUserLocation={true}
         onRegionChangeComplete={setMapRegion}
-        onLongPress={(e) => setCurrentLocations([...currentLocations, {
+        onLongPress={(e) => setSheepLocation([{latitude: e.nativeEvent.coordinate.latitude, 
+                                               longitude: e.nativeEvent.coordinate.longitude}]) 
+        /*setCurrentLocations([...currentLocations, {
           latitude: e.nativeEvent.coordinate.latitude,
           longitude: e.nativeEvent.coordinate.longitude,
           //setMarkers([...markers, {
@@ -83,16 +93,16 @@ export default function App() {
           //longitude: e.nativeEvent.coordinate.longitude,
           //id: markers.length,
           //value: e.nativeEvent.coordinate
-        }])}
+        }])*/}
         >
         <UrlTile 
           urlTemplate={urlTemplate}
           shouldReplaceMapContent={false}
         />
 
-        {console.log("running " + markers.length)}
         <MarkLocations locations = {currentLocations} />
            
+        <RegisterSheep currentLocation = {currentLocation} sheepLocation = {sheepLocation} />
   
         {/*
         <MarkLocations />        
@@ -112,15 +122,20 @@ export default function App() {
           </MapView.Marker>)})}*/}
 
       </MapView>
+      {visibleSettings && (
+      <DownloadTiles mapRegion={mapRegion} onFinish={onDownloadComplete} />)}
+
       <View style={styles.actionContainer}>
-        <Button raised title={'Last ned kart'} onPress={toggeleDownloadSettings} />
+        <Button raised title={'Last ned kart'} onPress={toggleDownloadSettings} />
         <Button raised title={'Slett kart'} onPress={deleteTiles} />
         <Button raised title={isOffline ? 'Bruk online' : 'Bruk offline'} onPress={toggleOffline}/>
       </View>      
-      <Button raised title='Track location' onPress={toggleTrackLocation}/>
-      {visisbleSettings && (
-      <DownloadTiles mapRegion={mapRegion} onFinish={onDownloadComplete} />)}
-      {trackLocation && <TrackLocation listOfLocations={getCurrentLocations} />}
+
+
+      <Button raised title={stopTracking ? 'Start ny oppsynstur' : 'Avslutt oppsynstur'} onPress={toggleTrackLocation}/>
+
+      
+      {<TrackLocation listOfLocations={getCurrentLocations} stopTracking={stopTracking} currentLocation={getCurrentLocation} />}
     </View>
   )   
 }
