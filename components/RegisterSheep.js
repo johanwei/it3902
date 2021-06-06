@@ -9,33 +9,57 @@
 */
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Polyline } from 'react-native-maps';
+import { Button } from 'react-native';
+import { View, Text } from 'react-native';
+import { Polyline, Marker, Callout } from 'react-native-maps';
 
 export default function RegisterSheep(props) {
 
     const [registeredSheep, setRegisteredSheep] = useState([])
 
     useEffect(() => {
-        if(props.currentLocation){
-            console.log(props.currentLocation);
-        setRegisteredSheep([...registeredSheep, [{latitude: props.currentLocation.coords.latitude, 
-                                                  longitude: props.currentLocation.coords.longitude},
-                                                {latitude: props.sheepLocation[0].latitude,
-                                                 longitude: props.sheepLocation[0].longitude}]
-                                            ])}
-    }, props.sheepLocation)
+        if(props.currentLocation && props.sheepInformation){
+            setRegisteredSheep([...registeredSheep, 
+                [{latitude: props.currentLocation.coords.latitude, 
+                  longitude: props.currentLocation.coords.longitude},
+                 {latitude: props.sheepLocation[0].latitude,
+                  longitude: props.sheepLocation[0].longitude},
+                props.sheepInformation]
+            ])
+        }
+        props.registrationFinished()
+    }, [props.sheepInformation])
+
+    /*
+    registeredSheep:
+        [
+            [{latitude: startlat, longitude: startlon}, 
+            {latitude: endlat, longitude: endlon}],
+            
+            [{latitude: startlat, longitude: startlon}, 
+            {latitude: endlat, longitude: endlon}]]
+    */
+
     
-
-    //[[{latitude: startlat, longitude: startlon}, {latitude: endlat, longitude: endlon}],
-     //[{latitude: startlat, longitude: startlon}, {latitude: endlat, longitude: endlon}]]
-
+    
     return (
         registeredSheep.map((position, i) => (
-            <Polyline key={i}
-            coordinates={position}
-            strokeWidth={6}
-            strokeColor={"red"}
-        />
-        ))
-    )
+            <View key={i}>
+                <Polyline
+                coordinates={position.slice(0,2)}
+                strokeWidth={6}
+                strokeColor={"red"}
+                />
+                <Marker key={i} coordinate={position[1]}>
+                    <Callout>
+                        <Text>Latitude: {position[1].latitude}</Text>
+                        <Text>Longitude: {position[1].longitude}</Text>
+                        <Text>Note: {position[2]}</Text>
+                    </Callout>        
+                    </Marker>
+            </View>
+        )
+        )
+        )
+        
 }

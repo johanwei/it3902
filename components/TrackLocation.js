@@ -7,7 +7,7 @@ let locationsString = "";
 
 export default function trackLocation(props) {
   if (props.stopTracking) {
-    console.log("stoptracking");
+    //console.log("stoptracking");
     locationsString = "";
     return (null);
   }

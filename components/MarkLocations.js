@@ -4,7 +4,7 @@ import MapView, { Polyline} from 'react-native-maps';
 
 
 export default function MarkLocations(props) {
-	console.log("marklocations: " + props.locations.length);
+	//console.log("marklocations: " + props.locations.length);
 
     return (
 		<View>

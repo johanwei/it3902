@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
 import MapView, { UrlTile, Polyline } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
@@ -6,6 +6,10 @@ import DownloadTiles from './components/DownloadTiles';
 import TrackLocation from './components/TrackLocation';
 import MarkLocations from './components/MarkLocations';
 import RegisterSheep from './components/RegisterSheep';
+import { ConfirmDialog } from 'react-native-simple-dialogs';
+import SheepNote from './components/SheepNote';
+
+
 
 const MAP_TYPE = Platform.OS == 'android' ? 'none' : 'standard'
 
@@ -28,7 +32,8 @@ export default function App() {
   const [currentLocation, setCurrentLocation] = useState()
   const [stopTracking, setStopTracking] = useState(true)
   const [sheepLocation, setSheepLocation] = useState([{latitude: 69, longitude: 16}])
-
+  const [newSheepLocation, setNewSheepLocation] = useState(false)
+  const [sheepInformation, setSheepInformation] = useState(false)
 
     
   const urlTemplate = useMemo(
@@ -53,7 +58,7 @@ export default function App() {
   }
 
   function toggleDownloadSettings() {
-    setVisibleSettings(!visisbleSettings)
+    setVisibleSettings(!visibleSettings)
   }
 
   function onDownloadComplete() {
@@ -73,9 +78,20 @@ export default function App() {
     setStopTracking(!stopTracking)
     setTrackLocation(!trackLocation);
   }
+
+  function registerNewSheep(info){
+    if (info != "cancel"){
+      setSheepInformation(info)
+    }
+    setNewSheepLocation(false)
+  }
+  
+
+  function registrationFinished(){
+    setSheepInformation("")
+  }
     
   return (
-    
       <View style={styles.container}>
         <MapView 
         style={{ flex: 1}} 
@@ -83,43 +99,21 @@ export default function App() {
         maxZoomLevel={18}
         showsUserLocation={true}
         onRegionChangeComplete={setMapRegion}
-        onLongPress={(e) => setSheepLocation([{latitude: e.nativeEvent.coordinate.latitude, 
-                                               longitude: e.nativeEvent.coordinate.longitude}]) 
-        /*setCurrentLocations([...currentLocations, {
-          latitude: e.nativeEvent.coordinate.latitude,
-          longitude: e.nativeEvent.coordinate.longitude,
-          //setMarkers([...markers, {
-          //latitude: e.nativeEvent.coordinate.latitude,
-          //longitude: e.nativeEvent.coordinate.longitude,
-          //id: markers.length,
-          //value: e.nativeEvent.coordinate
-        }])*/}
+        onLongPress={(e) => {setSheepLocation([{latitude: e.nativeEvent.coordinate.latitude, 
+                                               longitude: e.nativeEvent.coordinate.longitude}])
+                                               setNewSheepLocation(true);
+                                              }}
         >
         <UrlTile 
           urlTemplate={urlTemplate}
           shouldReplaceMapContent={false}
         />
-
+        
         <MarkLocations locations = {currentLocations} />
-           
-        <RegisterSheep currentLocation = {currentLocation} sheepLocation = {sheepLocation} />
-  
-        {/*
-        <MarkLocations />        
-        <Polyline
-            coordinates={currentLocations}
-        strokeWidth={6}
+        
+        <RegisterSheep currentLocation = {currentLocation} sheepLocation = {sheepLocation} sheepInformation={sheepInformation} registrationFinished={registrationFinished} />
 
-        />
-        {markers.map((marker) => {
-          return (
-        <MapView.Marker key={marker.id} coordinate={marker.value}>
-          <MapView.Callout>
-            <Text>ID: {marker.id}</Text>
-            <Text>Latitude: {marker.value.latitude}</Text>
-            <Text>Longitude: {marker.value.longitude}</Text>
-          </MapView.Callout>        
-          </MapView.Marker>)})}*/}
+        
 
       </MapView>
       {visibleSettings && (
@@ -134,7 +128,11 @@ export default function App() {
 
       <Button raised title={stopTracking ? 'Start ny oppsynstur' : 'Avslutt oppsynstur'} onPress={toggleTrackLocation}/>
 
-      
+      {/*console.log("sheepRegistered: " + sheepRegistered)*/}
+      {/*console.log("newSheepLocation: " + newSheepLocation)*/}
+
+      {newSheepLocation && (<SheepNote sheepInformation={registerNewSheep}/>)}
+
       {<TrackLocation listOfLocations={getCurrentLocations} stopTracking={stopTracking} currentLocation={getCurrentLocation} />}
     </View>
   )   
