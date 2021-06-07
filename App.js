@@ -94,7 +94,7 @@ export default function App() {
   return (
       <View style={styles.container}>
         <MapView 
-        style={{ flex: 1}} 
+        style={{ flex: 1 }} 
         mapType={'standard'}
         maxZoomLevel={18}
         showsUserLocation={true}
@@ -104,7 +104,7 @@ export default function App() {
                                                setNewSheepLocation(true);
                                               }}
         >
-        <UrlTile 
+        <UrlTile
           urlTemplate={urlTemplate}
           shouldReplaceMapContent={false}
         />
@@ -141,20 +141,21 @@ export default function App() {
 const styles = StyleSheet.create({
   actionContainer: {
     flexDirection: 'row',
-    padding: 15,
-    paddingTop: 30,
+    paddingTop: 35,
     zIndex: 999,
     justifyContent: 'space-around',
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
+    backgroundColor: 'white',
   },
   button: {
     backgroundColor: 'white',
     borderRadius: 10,
   },
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: "white",
   }
 })

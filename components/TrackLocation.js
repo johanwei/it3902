@@ -33,7 +33,7 @@ export default function trackLocation(props) {
   }, []);
 
   return (
-      <Text>Current location {locationsList.length}</Text>
+      null
   )   
 }
 

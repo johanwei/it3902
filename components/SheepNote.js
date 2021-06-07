@@ -1,8 +1,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Alert, Modal, StyleSheet, Text, Pressable, View } from 'react-native';
-import { Polyline, Marker, Callout } from 'react-native-maps';
-import { ConfirmDialog } from 'react-native-simple-dialogs';
 import Dialog from "react-native-dialog";
 
 
@@ -24,17 +22,14 @@ export default function SheepNote(props) {
     return (
       <View>
         <Dialog.Container visible={modalVisible}>
-          <Dialog.Title>Register sheep</Dialog.Title>
-          <Dialog.Description>
-            Enter text and press "Register" to register sheep observation
-          </Dialog.Description>
-          <Dialog.Input placeholder="Enter note here" 
+          <Dialog.Title>Registrer sau</Dialog.Title>
+          <Dialog.Input placeholder="Skriv notat her" 
                         onChangeText={onChangeNote} 
                         numberOfLines={4}
                         multiline
                         />
-          <Dialog.Button label="Cancel" onPress={handleCancel}/>
-          <Dialog.Button label="Register" onPress={handleRegister} />
+          <Dialog.Button label="Avbryt" onPress={handleCancel}/>
+          <Dialog.Button label="Registrer" onPress={handleRegister} />
         </Dialog.Container>
      </View>
     );

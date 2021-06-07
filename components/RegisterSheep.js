@@ -9,13 +9,14 @@
 */
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Button } from 'react-native';
+import { StyleSheet, Button, TouchableOpacity } from 'react-native';
 import { View, Text } from 'react-native';
 import { Polyline, Marker, Callout } from 'react-native-maps';
 
 export default function RegisterSheep(props) {
 
     const [registeredSheep, setRegisteredSheep] = useState([])
+    const [forceUpdate, setForceUpdate] = useState(false)
 
     useEffect(() => {
         if(props.currentLocation && props.sheepInformation){
@@ -40,11 +41,15 @@ export default function RegisterSheep(props) {
             {latitude: endlat, longitude: endlon}]]
     */
 
-    
+    function deleteRegistration(i){
+        let index = registeredSheep.indexOf(i)
+        registeredSheep.splice(index, 1)
+        setForceUpdate(!forceUpdate)
+    }
     
     return (
         registeredSheep.map((position, i) => (
-            <View key={i}>
+            <View key={i} style={styles.container}>
                 <Polyline
                 coordinates={position.slice(0,2)}
                 strokeWidth={6}
@@ -52,14 +57,38 @@ export default function RegisterSheep(props) {
                 />
                 <Marker key={i} coordinate={position[1]}>
                     <Callout>
-                        <Text>Latitude: {position[1].latitude}</Text>
-                        <Text>Longitude: {position[1].longitude}</Text>
-                        <Text>Note: {position[2]}</Text>
+                        <Text style={styles.container}>Latitude: {position[1].latitude}</Text>
+                        <Text style={styles.container}>Longitude: {position[1].longitude}</Text>
+                        <Text style={styles.container}>Notat: {position[2]}</Text>
+                        <TouchableOpacity onPress={() => deleteRegistration(position)} style={styles.appButtonContainer}>
+                            <Text style={styles.appButtonText}>Delete note</Text>
+                        </TouchableOpacity>
                     </Callout>        
                     </Marker>
             </View>
-        )
-        )
-        )
-        
+        ))
+    )
 }
+
+const styles = StyleSheet.create({
+    container: {
+        fontSize: 14,
+        margin:5,
+        maxWidth: 380
+    },
+    appButtonContainer: {
+        fontSize: 14,
+        elevation: 8,
+        backgroundColor: "red",
+        borderRadius: 10,
+        margin:12
+      },
+      appButtonText: {
+        fontSize: 14,
+        color: "#fff",
+        fontWeight: "bold",
+        alignSelf: "center",
+        textTransform: "uppercase",
+        padding: 5,
+      }
+  });
