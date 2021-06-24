@@ -4,11 +4,8 @@ import MapView, { Polyline} from 'react-native-maps';
 
 
 export default function MarkLocations(props) {
-	//console.log("marklocations: " + props.locations.length);
-
     return (
 		<View>
-			{/*<Text style={styles.actionContainer}>{props.locations.length}</Text>*/}
 			<Polyline
 				coordinates={props.locations}
 				strokeWidth={6}

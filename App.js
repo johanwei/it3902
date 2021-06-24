@@ -3,18 +3,14 @@ import { StyleSheet, Text, View, Button } from 'react-native';
 import MapView, { UrlTile, Polyline } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import DownloadTiles from './components/DownloadTiles';
-import TrackLocation from './components/TrackLocation';
+import TrackLocation from './data/TrackLocation';
 import MarkLocations from './components/MarkLocations';
 import RegisterSheep from './components/RegisterSheep';
-import { ConfirmDialog } from 'react-native-simple-dialogs';
 import SheepNote from './components/SheepNote';
-
-
 
 const MAP_TYPE = Platform.OS == 'android' ? 'none' : 'standard'
 
 export default function App() {
-
   const MAP_URL =  'https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}'
   const TILES_FOLDER = `${FileSystem.documentDirectory}tiles/{z}-{x}-{y}.png`
   const INITIAL_REGION = {
@@ -34,7 +30,6 @@ export default function App() {
   const [sheepLocation, setSheepLocation] = useState([{latitude: 69, longitude: 16}])
   const [newSheepLocation, setNewSheepLocation] = useState(false)
   const [sheepInformation, setSheepInformation] = useState(false)
-
     
   const urlTemplate = useMemo(
     () =>
@@ -86,7 +81,6 @@ export default function App() {
     setNewSheepLocation(false)
   }
   
-
   function registrationFinished(){
     setSheepInformation("")
   }
@@ -112,9 +106,6 @@ export default function App() {
         <MarkLocations locations = {currentLocations} />
         
         <RegisterSheep currentLocation = {currentLocation} sheepLocation = {sheepLocation} sheepInformation={sheepInformation} registrationFinished={registrationFinished} />
-
-        
-
       </MapView>
       {visibleSettings && (
       <DownloadTiles mapRegion={mapRegion} onFinish={onDownloadComplete} />)}
@@ -125,11 +116,7 @@ export default function App() {
         <Button raised title={isOffline ? 'Bruk online' : 'Bruk offline'} onPress={toggleOffline}/>
       </View>      
 
-
       <Button raised title={stopTracking ? 'Start ny oppsynstur' : 'Avslutt oppsynstur'} onPress={toggleTrackLocation}/>
-
-      {/*console.log("sheepRegistered: " + sheepRegistered)*/}
-      {/*console.log("newSheepLocation: " + newSheepLocation)*/}
 
       {newSheepLocation && (<SheepNote sheepInformation={registerNewSheep}/>)}
 

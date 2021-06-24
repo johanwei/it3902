@@ -21,43 +21,37 @@ export default function downloadTiles(props) {
     setIsLoading(true)
 
     const tiles = tileGridForRegion(props.mapRegion, currentZoom, maxZoom)
+    console.log(tiles);
  
     setTotalTiles(tiles.length)
-    /*
-       * For Expo to be able to download the tiles,
-       * the directories have to be created first.
-       */
-      /*for (const tile of tiles) {
-        const folder = `${FileSystem.documentDirectory}tiles/${tile.z}/${tile.x}`
-        await FileSystem.makeDirectoryAsync(folder, { intermediates: true })
-      }*/
-      await FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}tiles`, { intermediates: true })
 
-      const BATCH_SIZE = 10
+    await FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}tiles`, { intermediates: true })
 
-      let batch = []
-      let tilesCounter = 0
-  
-      for (const tile of tiles){
-        const fetchUrl = `https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom=${tile.z}&x=${tile.x}&y=${tile.y}`
-        const localLocation = `${FileSystem.documentDirectory}tiles/${tile.z}-${tile.x}-${tile.y}.png`
-        const tilePromise = FileSystem.downloadAsync(fetchUrl, localLocation)
-        batch.push(tilePromise)
-        
-        if (batch.length >= BATCH_SIZE) {
-          tilesCounter += (await Promise.all(batch)).length
-          setTilesDownloaded(tilesCounter)
-          batch = []
-        }
-      }
+    const BATCH_SIZE = 10
+
+    let batch = []
+    let tilesCounter = 0
+
+    for (const tile of tiles){
+      const fetchUrl = `https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom=${tile.z}&x=${tile.x}&y=${tile.y}`
+      const localLocation = `${FileSystem.documentDirectory}tiles/${tile.z}-${tile.x}-${tile.y}.png`
+      const tilePromise = FileSystem.downloadAsync(fetchUrl, localLocation)
+      batch.push(tilePromise)
       
-      tilesCounter += (await Promise.all(batch)).length
-      setTilesDownloaded(tilesCounter)
-
-      alert('Kartet er lastet ned. Du kan nå vise det i offline-modus.')
-      setIsLoading(false)
-      props.onFinish()
+      if (batch.length >= BATCH_SIZE) {
+        tilesCounter += (await Promise.all(batch)).length
+        setTilesDownloaded(tilesCounter)
+        batch = []
+      }
     }
+    
+    tilesCounter += (await Promise.all(batch)).length
+    setTilesDownloaded(tilesCounter)
+
+    alert('Kartet er lastet ned. Du kan nå vise det i offline-modus.')
+    setIsLoading(false)
+    props.onFinish()
+  }
 
     return (
       <View

@@ -4,8 +4,6 @@
     - Two options:
         1. write a note and save observation
         2. cancel
-    - When the note is saved ?
-
 */
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -41,26 +39,26 @@ export default function RegisterSheep(props) {
             {latitude: endlat, longitude: endlon}]]
     */
 
-    function deleteRegistration(i){
-        let index = registeredSheep.indexOf(i)
+    function deleteRegistration(observationInfo){
+        let index = registeredSheep.indexOf(observationInfo)
         registeredSheep.splice(index, 1)
         setForceUpdate(!forceUpdate)
     }
     
     return (
-        registeredSheep.map((position, i) => (
+        registeredSheep.map((observationInfo, i) => (
             <View key={i} style={styles.container}>
                 <Polyline
-                coordinates={position.slice(0,2)}
+                coordinates={observationInfo.slice(0,2)}
                 strokeWidth={6}
                 strokeColor={"red"}
                 />
-                <Marker key={i} coordinate={position[1]}>
+                <Marker key={i} coordinate={observationInfo[1]}>
                     <Callout>
-                        <Text style={styles.container}>Latitude: {position[1].latitude}</Text>
-                        <Text style={styles.container}>Longitude: {position[1].longitude}</Text>
-                        <Text style={styles.container}>Notat: {position[2]}</Text>
-                        <TouchableOpacity onPress={() => deleteRegistration(position)} style={styles.appButtonContainer}>
+                        <Text style={styles.container}>Latitude: {observationInfo[1].latitude}</Text>
+                        <Text style={styles.container}>Longitude: {observationInfo[1].longitude}</Text>
+                        <Text style={styles.container}>Notat: {observationInfo[2]}</Text>
+                        <TouchableOpacity onPress={() => deleteRegistration(observationInfo)} style={styles.appButtonContainer}>
                             <Text style={styles.appButtonText}>Delete note</Text>
                         </TouchableOpacity>
                     </Callout>        
