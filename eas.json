@@ -1,0 +1,16 @@
+{
+  "builds": {
+    "ios": {
+      "preview": {
+        "distribution": "internal",
+        "workflow": "generic"
+      },
+      "android": {
+        "preview": {
+          "distribution": "internal",
+          "workflow": "generic"
+        }
+      }
+    }
+  }
+}
